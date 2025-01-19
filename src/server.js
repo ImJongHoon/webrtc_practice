@@ -17,11 +17,27 @@ const handleListen = () => console.log(`Listening on http://localhost:3000 and w
 const server = http.createServer(app);
 const webSocketServer = new WebSocket.Server({server});
 
+const sockets = [];
+
 webSocketServer.on("connection", (socket) => {
+    sockets.push(socket);
+    socket["nickname"] = "익명";
     console.log("서버가 브라우저에 연결되었습니다!")
     socket.on("close", () => {console.log("클라이언트랑 연결이 끊어졌다.")})
-    socket.on("message", (message)=>{})
-    socket.send("클라이언트에 보내는 메세지!")
+    
+    socket.on("message", (msg) => {
+        const message = JSON.parse(msg);
+        switch (message.type) {
+            case "new_message":
+                sockets.forEach((aSocket) =>
+                aSocket.send(`${socket.nickname}: ${message.payload}`)
+                );
+            break 
+            case "nickname":
+                socket["nickname"] = message.payload;
+            break
+        }
+      });
 })
 
 server.listen(3000, handleListen)
