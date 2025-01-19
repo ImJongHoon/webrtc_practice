@@ -17,4 +17,11 @@ const handleListen = () => console.log(`Listening on http://localhost:3000 and w
 const server = http.createServer(app);
 const webSocketServer = new WebSocket.Server({server});
 
+webSocketServer.on("connection", (socket) => {
+    console.log("서버가 브라우저에 연결되었습니다!")
+    socket.on("close", () => {console.log("클라이언트랑 연결이 끊어졌다.")})
+    socket.on("message", (message)=>{})
+    socket.send("클라이언트에 보내는 메세지!")
+})
+
 server.listen(3000, handleListen)
